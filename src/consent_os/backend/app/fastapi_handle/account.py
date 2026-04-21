@@ -7,7 +7,9 @@ from passlib.hash import bcrypt
 
 
 from app.helpers.password import verify_password
-from app.structures.user import UserCreate, UserDB, LoginRequest
+from app.structures.user.user import UserDB
+from app.structures.user.login_request import LoginRequest
+from app.structures.user.create_user import UserCreate
 from app.helpers.jwt import create_access_token
 from app.fastapi_handle.main import app, get_db
 
