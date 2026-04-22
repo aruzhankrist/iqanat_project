@@ -1,9 +1,9 @@
 import uuid
+import datetime
 
 from fastapi import Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from passlib.hash import bcrypt
 
 
 from app.helpers.password import verify_password
@@ -12,6 +12,8 @@ from app.structures.user.login_request import LoginRequest
 from app.structures.user.create_user import UserCreate
 from app.helpers.jwt import create_access_token
 from app.fastapi_handle.main import app, get_db
+from app.helpers.password import hash_password
+from app.structures.contracts.contracts import History, Agreements, RiskLevel
 
 
 @app.get("/account")
@@ -40,13 +42,35 @@ def get_login(user: LoginRequest, db: Session = Depends(get_db)):
 
 @app.post("/register")
 def create_profile(user: UserCreate, db: Session = Depends(get_db)):
-    data = {
-        "user_id": uuid.uuid4(),
-        "email": user.email,
-        "password": bcrypt.hash(user.password),
-    }
-    new_user = UserDB(**data)
+    # проверка существования
+    stmt = select(UserDB).where(UserDB.email == user.email)  # type: ignore
+    existing_user = db.execute(stmt).scalar_one_or_none()
+
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    risk_level = RiskLevel
+
+    # создаём пользователя
+    new_user = UserDB(
+        user_id=uuid.uuid4(),  # можно убрать если default в модели
+        email=user.email,
+        username=user.username,
+        password=hash_password(user.password),
+        agreements=None,
+        admin=False,
+        history=None,
+        privacy=RiskLevel(risk_level.low),
+        notifycations=False,
+        created=datetime.datetime.now(),
+    )
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return {"success": True, "message": "регистрация прошла успешно"}
+
+    return {
+        "success": True,
+        "message": "регистрация прошла успешно",
+        "user_id": str(new_user.user_id),
+    }
