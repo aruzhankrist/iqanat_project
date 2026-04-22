@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>consent_os | Управление договорами</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>consent_os</h2>
+            </div>
+            <nav>
+                <button onclick="showSection('home')" class="nav-btn active"><i class="fas fa-home"></i> Главная</button>
+                <button onclick="showSection('contracts')" class="nav-btn"><i class="fas fa-file-alt"></i> Договора</button>
+                <button onclick="showSection('upload')" class="nav-btn"><i class="fas fa-cloud-upload-alt"></i> Загрузить</button>
+                <button onclick="showSection('history')" class="nav-btn"><i class="fas fa-history"></i> История</button>
+                <button onclick="showSection('settings')" class="nav-btn"><i class="fas fa-cog"></i> Настройки</button>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="showSection('auth')" class="auth-trigger"><i class="fas fa-user"></i> Аккаунт</button>
+            </div>
+        </aside>
+
+        <main class="content">
+            
+            <section id="home" class="page-section active">
+                <h1>Добро пожаловать в consent_os</h1>
+                <p>Ваша централизованная система безопасного управления согласиям и договорами.</p>
+                <div class="stats-grid">
+                    <div class="stat-card"><h3>12</h3><p>Активных договоров</p></div>
+                    <div class="stat-card"><h3>3</h3><p>Требуют обновления</p></div>
+                </div>
+            </section>
+
+            <section id="contracts" class="page-section">
+                <div class="section-header">
+                    <h1>Ваши договора</h1>
+                    <input type="text" placeholder="Поиск по названию..." class="search-bar">
+                </div>
+                <div class="contract-list">
+                    <div class="contract-item">
+                        <div class="info">
+                            <h3>Трудовой договор №442</h3>
+                            <span>Обновлено: 12.04.2026</span>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-analyze" onclick="alert('Анализ запущен...')">Анализировать</button>
+                            <button class="btn-edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="contract-item">
+                        <div class="info">
+                            <h3>Согласие на обработку данных</h3>
+                            <span>Обновлено: 01.03.2026</span>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-analyze">Анализировать</button>
+                            <button class="btn-edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="upload" class="page-section">
+                <h1>Загрузить новый договор</h1>
+                <div class="upload-zone">
+                    <i class="fas fa-file-upload"></i>
+                    <p>Перетащите файл сюда или нажмите для выбора</p>
+                    <input type="file" class="file-input">
+                </div>
+            </section>
+
+            <section id="history" class="page-section">
+                <h1>История действий</h1>
+                <ul class="history-log">
+                    <li><span>14:20</span> Удален договор "Тестовый_файл.pdf"</li>
+                    <li><span>10:15</span> Изменены настройки приватности</li>
+                    <li><span>Вчера</span> Загружен новый документ: "Аренда_2026"</li>
+                </ul>
+            </section>
+
+            <section id="settings" class="page-section">
+                <h1>Настройки аккаунта</h1>
+                <div class="settings-box">
+                    <div class="setting-item">
+                        <label>Email уведомления</label>
+                        <input type="checkbox" checked>
+                    </div>
+                    <div class="setting-item">
+                        <label>Язык интерфейса</label>
+                        <select><option>Русский</option><option>English</option></select>
+                    </div>
+                    <hr>
+                    <button class="btn-save">Сохранить изменения</button>
+                    <button class="btn-danger" onclick="confirm('Вы уверены, что хотите удалить аккаунт?')">Удалить аккаунт</button>
+                </div>
+            </section>
+
+            <section id="auth" class="page-section">
+                <div class="auth-container">
+                    <div class="auth-tabs">
+                        <button class="tab-btn active">Вход</button>
+                        <button class="tab-btn">Регистрация</button>
+                    </div>
+                    <form class="auth-form">
+                        <input type="email" placeholder="Ваш Email" required>
+                        <input type="password" placeholder="Пароль" required>
+                        <button type="submit" class="btn-main">Продолжить</button>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Скрываем все секции
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Удаляем активный класс у кнопок
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Показываем нужную
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Подсвечиваем кнопку в меню
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

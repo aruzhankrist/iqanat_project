@@ -1,0 +1,201 @@
+:root {
+    --primary: #3b82f6;
+    --dark: #1f2937;
+    --bg: #f3f4f6;
+    --white: #ffffff;
+    --danger: #ef4444;
+    --text: #374151;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background-color: var(--dark);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+.logo {
+    padding: 0 25px 30px;
+    text-align: center;
+    color: var(--primary);
+    letter-spacing: 1px;
+}
+
+nav {
+    flex-grow: 1;
+}
+
+.nav-btn {
+    width: 100%;
+    padding: 15px 25px;
+    background: none;
+    border: none;
+    color: #9ca3af;
+    text-align: left;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+.nav-btn i {
+    margin-right: 15px;
+    width: 20px;
+}
+
+.nav-btn:hover, .nav-btn.active {
+    background: #374151;
+    color: white;
+}
+
+.nav-btn.active {
+    border-left: 4px solid var(--primary);
+}
+
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid #374151;
+}
+
+.auth-trigger {
+    background: none;
+    border: 1px solid #4b5563;
+    color: white;
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Content Area */
+.content {
+    flex-grow: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.page-section {
+    display: none;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.page-section.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 { margin-bottom: 20px; font-size: 28px; }
+
+/* Contracts List */
+.contract-item {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.contract-item .info h3 { font-size: 18px; margin-bottom: 5px; }
+.contract-item .info span { color: #9ca3af; font-size: 14px; }
+
+.actions button {
+    padding: 8px 12px;
+    margin-left: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-analyze { background: #dbeafe; color: var(--primary); font-weight: bold; }
+.btn-edit { background: #f3f4f6; color: var(--text); }
+.btn-delete { background: #fee2e2; color: var(--danger); }
+
+/* Upload Zone */
+.upload-zone {
+    border: 2px dashed #cbd5e1;
+    padding: 60px;
+    text-align: center;
+    border-radius: 20px;
+    background: var(--white);
+    cursor: pointer;
+}
+
+.upload-zone i { font-size: 50px; color: var(--primary); margin-bottom: 20px; }
+
+/* Stats & Settings */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.stat-card {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.settings-box {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.btn-main {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+.btn-danger {
+    background: none;
+    color: var(--danger);
+    border: none;
+    margin-top: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}

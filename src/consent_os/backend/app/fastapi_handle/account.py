@@ -150,7 +150,7 @@ def create_profile(user: UserCreate, db: Session = Depends(get_db)):
         is_verified=False,
         failed_login_attempts=0,
         agreements=None,
-        history=history_entry,
+        history=[history_entry],
         created=datetime.datetime.now(datetime.timezone.utc),
     )
 

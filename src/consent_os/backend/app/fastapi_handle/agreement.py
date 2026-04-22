@@ -126,7 +126,9 @@ def delete_agreement(
 
 
 @app.post("/agreements/upload/analyse")
-def analyse_agreement(agreement: bytes | str, reason: str):
+def analyse_agreement(
+    agreement: bytes | str, reason: str, current_user=Depends(get_current_user)
+):
     if not agreement:
         raise HTTPException(status_code=400, detail="Agreement text is required")
 
@@ -155,7 +157,11 @@ def analyse_agreement(agreement: bytes | str, reason: str):
 
 
 @app.patch("/agreements/{agreement_id}/update")
-def update_agreement(agreement_id: str, update_info: AgreementUpdate):
+def update_agreement(
+    agreement_id: str,
+    update_info: AgreementUpdate,
+    current_user=Depends(get_current_user),
+):
     # TODO:
     # потом:
     # найти договор в БД

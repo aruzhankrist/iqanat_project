@@ -33,4 +33,4 @@ class UserDB(BaseModel):
 
     # relations (логически, не как поле БД)
     agreements: Agreements | None
-    history: History
+    history: list[History]
