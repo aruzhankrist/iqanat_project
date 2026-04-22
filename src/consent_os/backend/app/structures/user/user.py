@@ -2,7 +2,7 @@ import datetime
 import uuid
 
 from pydantic import BaseModel, EmailStr, Field
-from app.structures.contracts.contracts import History, Agreements, RiskLevel
+from app.structures.contracts.contracts import Agreements, RiskLevel
 
 
 class UserDB(BaseModel):
@@ -14,7 +14,7 @@ class UserDB(BaseModel):
     role: str = "user"
 
     privacy: RiskLevel
-    notifycations: bool
+    notifications: bool
 
     is_active: bool = True
     is_verified: bool = False
@@ -33,4 +33,3 @@ class UserDB(BaseModel):
 
     # relations (логически, не как поле БД)
     agreements: Agreements | None
-    history: list[History]

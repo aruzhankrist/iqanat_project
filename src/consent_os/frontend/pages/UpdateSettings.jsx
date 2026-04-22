@@ -5,7 +5,7 @@ export default function Settings() {
   const [form, setForm] = useState({
     username: "",
     email: "",
-    notifycations: false,
+    notifications: false,
     privacy: "low"
   });
 
@@ -47,7 +47,7 @@ export default function Settings() {
         Notifications
         <input
           type="checkbox"
-          name="notifycations"
+          name="notifications"
           onChange={handleChange}
         />
       </label>

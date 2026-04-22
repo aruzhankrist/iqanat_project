@@ -24,7 +24,7 @@ def get_settings(
 
     return {
         "privacy": user.privacy,
-        "notifications": user.notifycations,
+        "notifications": user.notifications,
         "marketing_opt_in": user.marketing_opt_in,
         "role": user.role,
     }

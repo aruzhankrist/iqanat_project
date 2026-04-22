@@ -4,8 +4,8 @@ from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.helpers.jwt import get_current_user
+from app.sql_handle.models import ContractDB
 from app.structures.contracts.contracts import (
-    ContractDB,
     RiskLevel,
     Permissions,
 )

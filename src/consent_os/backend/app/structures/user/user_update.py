@@ -7,6 +7,6 @@ class AccountSettingsUpdate(BaseModel):
 
     privacy: RiskLevel | None = None
 
-    notifycations: bool | None = None
+    notifications: bool | None = None
 
     marketing_opt_in: bool | None = None

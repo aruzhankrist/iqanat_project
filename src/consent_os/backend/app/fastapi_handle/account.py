@@ -1,5 +1,6 @@
 import uuid
 import datetime
+import traceback
 
 from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy import select
@@ -7,14 +8,15 @@ from sqlalchemy.orm import Session
 
 
 from app.helpers.password import verify_password
-from app.structures.user.user import UserDB
+from app.sql_handle.models import UserDB
+from app.sql_handle.models import History
 from app.structures.user.login_request import LoginRequest
 from app.structures.user.create_user import UserCreate
 from app.structures.user.user_update import AccountSettingsUpdate
 from app.helpers.jwt import create_access_token
 from app.db.session import get_db
 from app.helpers.password import hash_password
-from app.structures.contracts.contracts import History, RiskLevel
+from app.structures.contracts.contracts import RiskLevel
 from app.helpers.jwt import get_current_user
 
 
@@ -39,7 +41,7 @@ def get_user_data(
         "email": user.email,
         "role": user.role,
         "privacy": user.privacy,
-        "notifications": user.notifycations,
+        "notifications": user.notifications,
         "is_verified": user.is_verified,
         "created": user.created,
         "last_login": user.last_login,
@@ -123,43 +125,47 @@ def get_login(user: LoginRequest, db: Session = Depends(get_db)):
 
 @app.post("/register")
 def create_profile(user: UserCreate, db: Session = Depends(get_db)):
-    stmt = select(UserDB).where(UserDB.email == user.email)  # type: ignore
-    existing_user = db.execute(stmt).scalar_one_or_none()
+    try:
+        stmt = select(UserDB).where(UserDB.email == user.email)  # type: ignore
+        existing_user = db.execute(stmt).scalar_one_or_none()
 
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
 
-    new_user_id = uuid.uuid4()
-    history_entry = History(
-        nickname=user.username,
-        action="user_registered",
-        contract_id=None,
-        timestamp=datetime.datetime.now(datetime.timezone.utc),
-        contract_snapshot=None,
-    )
+        new_user_id = uuid.uuid4()
+        history_entry = History(
+            nickname=user.username,
+            action="user_registered",
+            contract_id=None,
+            timestamp=datetime.datetime.now(datetime.timezone.utc),
+            contract_snapshot=None,
+        )
 
-    new_user = UserDB(
-        user_id=new_user_id,
-        email=user.email,
-        username=user.username,
-        password=hash_password(user.password),
-        role="user",
-        privacy=RiskLevel.low,
-        notifycations=False,
-        is_active=True,
-        is_verified=False,
-        failed_login_attempts=0,
-        agreements=None,
-        history=[history_entry],
-        created=datetime.datetime.now(datetime.timezone.utc),
-    )
+        new_user = UserDB(
+            user_id=new_user_id,
+            email=user.email,
+            username=user.username,
+            password=hash_password(user.password),
+            role="user",
+            privacy=RiskLevel.low,
+            notifications=False,
+            is_active=True,
+            is_verified=False,
+            failed_login_attempts=0,
+            agreements=None,
+            created=datetime.datetime.now(datetime.timezone.utc),
+        )
 
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    return {
-        "success": True,
-        "message": "регистрация прошла успешно",
-        "user_id": str(new_user.user_id),
-    }
+        db.add(new_user)
+        db.add(history_entry)
+        db.commit()
+        db.refresh(new_user)
+        db.refresh(history_entry)
+        return {
+            "success": True,
+            "message": "регистрация прошла успешно",
+            "user_id": str(new_user.user_id),
+        }
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))

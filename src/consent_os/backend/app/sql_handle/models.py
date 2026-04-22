@@ -1,5 +1,7 @@
 import uuid
+import datetime
 
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import (
     UUID,
     Column,
@@ -8,36 +10,39 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     JSON,
+    ForeignKey,
 )
 from sqlalchemy.sql import func
-from sqlalchemy.orm import declarative_base
 
-
-Base = declarative_base()
+from app.sql_handle.base import Base
 
 
 class UserDB(Base):
     __tablename__ = "users"
 
     # 🧾 identity
-    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email = Column(String, unique=True, nullable=False, index=True)
-    password = Column(String(128), nullable=False)
-    username = Column(String(30), nullable=False)
-
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    email: Mapped[str] = mapped_column(String)
+    password: Mapped[str | None] = mapped_column(String(128))
+    username: Mapped[str] = mapped_column(String(30))
     # 👤 role system
     role = Column(String, default="user")
 
     # ⚖️ privacy / consent
     privacy = Column(String, nullable=False)
-    notifycations = Column(Boolean, default=True)
+    notifications = Column(Boolean, default=True)
 
     consent_version = Column(String, nullable=True)
     marketing_opt_in = Column(Boolean, default=False)
 
     # 🔐 status
-    is_active = Column(Boolean, default=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)
+    deleted_at: Mapped[datetime.datetime | None] = mapped_column(
+        DateTime, nullable=True
+    )
 
     # 🕒 activity tracking
     last_login = Column(DateTime, nullable=True)
@@ -49,7 +54,19 @@ class UserDB(Base):
 
     # 📦 relations (ВАЖНО: это не поля, а связи)
     agreements = Column(JSON, nullable=True)
-    history = Column(JSON, nullable=True)
+
+
+class History(Base):
+    __tablename__ = "history"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(ForeignKey("users.user_id"))
+
+    nickname = Column(String)
+    action = Column(String)
+    contract_id = Column(String, nullable=True)
+    timestamp = Column(DateTime)
+    contract_snapshot = Column(JSON, nullable=True)
 
 
 class ContractDB(Base):

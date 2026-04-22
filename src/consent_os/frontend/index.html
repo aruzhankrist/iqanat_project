@@ -16,7 +16,9 @@
             </div>
             <nav>
                 <button onclick="showSection('home')" class="nav-btn active"><i class="fas fa-home"></i> Главная</button>
-                <button onclick="showSection('contracts')" class="nav-btn"><i class="fas fa-file-alt"></i> Договора</button>
+                <button onclick="loadContracts()" class="nav-btn">
+                    <i class="fas fa-file-alt"></i> Договора
+                </button>
                 <button onclick="showSection('upload')" class="nav-btn"><i class="fas fa-cloud-upload-alt"></i> Загрузить</button>
                 <button onclick="showSection('history')" class="nav-btn"><i class="fas fa-history"></i> История</button>
                 <button onclick="showSection('settings')" class="nav-btn"><i class="fas fa-cog"></i> Настройки</button>
@@ -99,24 +101,35 @@
                     </div>
                     <hr>
                     <button class="btn-save">Сохранить изменения</button>
-                    <button class="btn-danger" onclick="confirm('Вы уверены, что хотите удалить аккаунт?')">Удалить аккаунт</button>
+                    <button class="btn-danger">Удалить аккаунт</button>
                 </div>
             </section>
 
             <section id="auth" class="page-section">
-                <div class="auth-container">
-                    <div class="auth-tabs">
-                        <button class="tab-btn active">Вход</button>
-                        <button class="tab-btn">Регистрация</button>
-                    </div>
-                    <form class="auth-form">
-                        <input type="email" placeholder="Ваш Email" required>
-                        <input type="password" placeholder="Пароль" required>
-                        <button type="submit" class="btn-main">Продолжить</button>
-                    </form>
-                </div>
-            </section>
+              <div class="auth-container">
 
+                <div class="auth-tabs">
+                  <button type="button" class="tab-btn active" id="loginTab">Вход</button>
+                  <button type="button" class="tab-btn" id="registerTab">Регистрация</button>
+                </div>
+
+                <!-- LOGIN -->
+                <form id="loginForm" class="auth-form">
+                  <input id="loginEmail" type="email" placeholder="Ваш Email" required>
+                  <input id="loginPassword" type="password" placeholder="Пароль" required>
+                  <button type="submit" class="btn-main">Войти</button>
+                </form>
+
+                <!-- REGISTER -->
+                <form id="registerForm" class="auth-form" style="display:none;">
+                  <input id="username" type="text" placeholder="Имя пользователя" required>
+                  <input id="registerEmail" type="email" placeholder="Email" required>
+                  <input id="registerPassword" type="password" placeholder="Пароль" required>
+                  <button type="submit" class="btn-main">Зарегистрироваться</button>
+                </form>
+
+              </div>
+            </section>
         </main>
     </div>
 
@@ -138,6 +151,6 @@
             event.currentTarget.classList.add('active');
         }
     </script>
-    <script src="api.js"></script>
+    <script type="module" src="./api/main.js"></script>
 </body>
 </html>
