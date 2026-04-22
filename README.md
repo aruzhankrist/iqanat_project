@@ -221,6 +221,6 @@ Consent OS — это единая система управления согл�
 ## 👥 Команда
 
 unelected
-aruchankrist
+aruzhankrist
 
 ---
