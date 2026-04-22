@@ -25,7 +25,9 @@ def get_user_agreements(
     current_user=Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    stmt = select(ContractDB).where(ContractDB.user_id == current_user["user_id"])
+    user_id = uuid.UUID(current_user["user_id"])
+
+    stmt = select(ContractDB).where(ContractDB.user_id == user_id)
 
     agreements = db.execute(stmt).scalars().all()
 
@@ -38,9 +40,7 @@ def get_agreement(
     current_user=Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    stmt = select(ContractDB).where(
-        ContractDB.agreement_id == agreement_id  # type: ignore
-    )
+    stmt = select(ContractDB).where(ContractDB.agreement_id == agreement_id)
 
     agreement = db.execute(stmt).scalar_one_or_none()
 

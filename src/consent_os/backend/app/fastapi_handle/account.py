@@ -114,7 +114,9 @@ def get_login(user: LoginRequest, db: Session = Depends(get_db)):
     if not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Wrong password")
 
-    token = create_access_token({"user_id": db_user.user_id, "email": db_user.email})
+    token = create_access_token(
+        {"user_id": str(db_user.user_id), "email": db_user.email}
+    )
     return {
         "token": token,
         "token_type": "bearer",
