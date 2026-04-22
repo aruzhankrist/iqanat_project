@@ -1,27 +1,66 @@
 import datetime
 import uuid
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
-from app.fastapi_handle.main import app, get_db
-from consent_os.backend.app.helpers.jwt import get_current_user
-from consent_os.backend.app.structures.contracts.contracts import (
+from app.db.session import get_db
+from app.helpers.jwt import get_current_user
+from app.structures.contracts.contracts import (
     ContractDB,
     RiskLevel,
     Permissions,
 )
 from sqlalchemy import select
 
-from consent_os.backend.app.structures.contracts.safety import AgreementCreate
+from app.structures.contracts.safety import (
+    AgreementCreate,
+    AgreementUpdate,
+)
+
+
+app = APIRouter()
 
 
 @app.get("/agreements")
-def get_user_agreements(user_id: str):
-    return None
+def get_user_agreements(
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    stmt = select(ContractDB).where(ContractDB.user_id == current_user["user_id"])
+
+    agreements = db.execute(stmt).scalars().all()
+
+    return agreements
 
 
 @app.get("/agreements/{agreement_id}")
-def get_agreement(agreement_id: str):
-    return agreement_id
+def get_agreement(
+    agreement_id: str,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    stmt = select(ContractDB).where(
+        ContractDB.agreement_id == agreement_id  # type: ignore
+    )
+
+    agreement = db.execute(stmt).scalar_one_or_none()
+
+    if not agreement:
+        raise HTTPException(status_code=404, detail="Agreement not found")
+
+    if agreement.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    return {
+        "agreement_id": str(agreement.agreement_id),
+        "title": agreement.title,
+        "reason": agreement.reason,
+        "content": agreement.content,
+        "status": agreement.status,
+        "risk_index": agreement.risk_index,
+        "permissions": agreement.permissions,
+        "metadata": agreement.metadata,
+        "created": agreement.created,
+    }
 
 
 @app.post("/agreements/upload")
@@ -86,11 +125,48 @@ def delete_agreement(
     return
 
 
-@app.get("/agreements/upload/analyse")
+@app.post("/agreements/upload/analyse")
 def analyse_agreement(agreement: bytes | str, reason: str):
-    return agreement
+    if not agreement:
+        raise HTTPException(status_code=400, detail="Agreement text is required")
+
+    # TODO:
+    # здесь позже:
+    # - вызов внешнего NLP/LLM сервиса
+    # - анализ рисков
+    # - извлечение permissions / metadata
+
+    return {
+        "success": True,
+        "message": "Agreement analysis completed",
+        "analysis": {
+            "risk_index": "medium",
+            "permissions": {
+                "data_control": "high",
+                "user_rights": "low",
+                "transfer_of_rights_to_third_parties": "medium",
+            },
+            "metadata_flags": {"cookies": True, "tracking": True},
+            "summary": (
+                "Potential third-party data sharing and moderate privacy risk detected."
+            ),
+        },
+    }
 
 
-@app.get("/agreements/{agreement_id}/update")
-def get_text(agreement_id: str, update_info):
-    return "contract upd"
+@app.patch("/agreements/{agreement_id}/update")
+def update_agreement(agreement_id: str, update_info: AgreementUpdate):
+    # TODO:
+    # потом:
+    # найти договор в БД
+    # проверить ownership через JWT
+    # обновить поля
+    # поднять version +=1
+
+    return {
+        "success": True,
+        "message": "Contract updated successfully",
+        "agreement_id": agreement_id,
+        "updated_fields": update_info.model_dump(exclude_none=True),
+        "version": 2,
+    }

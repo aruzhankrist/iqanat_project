@@ -7,77 +7,84 @@ from sqlalchemy import (
     String,
     Boolean,
     DateTime,
-    ForeignKey,
-    Text,
     JSON,
 )
+from sqlalchemy.sql import func
 from sqlalchemy.orm import declarative_base
-
-from sqlalchemy.orm import relationship
-from datetime import datetime, timezone
 
 
 Base = declarative_base()
 
 
-class Permission(Base):
-    __tablename__ = "permissions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    service = Column(String)
-    data = Column(String)
-
-
-class User(Base):
+class UserDB(Base):
     __tablename__ = "users"
 
+    # 🧾 identity
     user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-
     email = Column(String, unique=True, nullable=False, index=True)
     password = Column(String(128), nullable=False)
-
     username = Column(String(30), nullable=False)
 
+    # 👤 role system
+    role = Column(String, default="user")
+
+    # ⚖️ privacy / consent
+    privacy = Column(String, nullable=False)
     notifycations = Column(Boolean, default=True)
-    admin = Column(Boolean, default=False)
 
-    created = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
+    consent_version = Column(String, nullable=True)
+    marketing_opt_in = Column(Boolean, default=False)
 
-    # связи
-    agreements = relationship("AgreementDB", back_populates="user")
-    history = relationship("HistoryDB", back_populates="user")
+    # 🔐 status
+    is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
 
-    # если это enum/режимы
-    privacy = Column(String)
+    # 🕒 activity tracking
+    last_login = Column(DateTime, nullable=True)
+    created = Column(DateTime, server_default=func.now())
+
+    # 🔒 security
+    failed_login_attempts = Column(Integer, default=0)
+    locked_until = Column(DateTime, nullable=True)
+
+    # 📦 relations (ВАЖНО: это не поля, а связи)
+    agreements = Column(JSON, nullable=True)
+    history = Column(JSON, nullable=True)
 
 
 class ContractDB(Base):
     __tablename__ = "contracts"
 
+    # 🧾 идентификаторы
     agreement_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), nullable=False)
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False)
-
+    # 📄 контент договора
     title = Column(String(30), nullable=False)
-    content = Column(Text, nullable=False)  # лучше Text, чем String(5000)
     reason = Column(String(30), nullable=False)
+    content = Column(String(5000), nullable=False)
 
+    # ⚖️ состояние договора
     active = Column(Boolean, default=True)
+    status = Column(String, default="draft")  # draft / active / signed / revoked
 
-    created = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
+    # 🔢 риск / версия
+    risk_index = Column(String, nullable=False)
+    version = Column(Integer, default=1)
 
-    # если сложные структуры
-    browser_permissions = Column(JSON, nullable=True)
+    # 🔐 подпись
+    is_signed = Column(Boolean, default=False)
+    signed_at = Column(DateTime, nullable=True)
+
+    # 🕒 время
+    created = Column(DateTime, server_default=func.now())
+    updated = Column(DateTime, onupdate=func.now(), nullable=True)
+
+    # 🌐 контекст
+    source_ip = Column(String, nullable=True)
+
+    # 📦 сложные структуры (JSON поля)
     permissions = Column(JSON, nullable=False)
-    metadata = Column(JSON, nullable=True)
+    browser_permissions = Column(JSON, nullable=True)
+    metadata_info = Column(JSON, nullable=True)
     services = Column(JSON, nullable=True)
-
-    # если это enum
-    risk_index = Column(String)  # или Enum(...)
-
-    # связь с пользователем
-    user = relationship("UserDB", back_populates="agreements")

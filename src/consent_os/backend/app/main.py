@@ -10,8 +10,10 @@ from app.sql_handle.database import engine
 from app.sql_handle.models import Base
 
 
-Base.metadata.create_all(bind=engine)
+def init_db():
+    Base.metadata.create_all(bind=engine)
 
 
 if __name__ == "__main__":
-    uvicorn.run("fastapi_handle.main:app", reload=True)
+    init_db()
+    uvicorn.run("app.fastapi_handle.main:app", reload=True)
